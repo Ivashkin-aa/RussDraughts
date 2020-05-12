@@ -20,8 +20,13 @@ public class Cub {
     public void setFigure(Figure figure) {
         this.figure = figure;
     }
-    public Figure getFigure() {
+
+    Figure getFigure() {
         return figure;
+    }
+
+    boolean hasFigure() {
+        return figure != null;
     }
 
 }

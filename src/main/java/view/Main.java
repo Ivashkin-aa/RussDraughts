@@ -1,5 +1,6 @@
 package view;
 
+
 import javafx.application.Application;
 
 import javafx.scene.Group;
@@ -8,17 +9,24 @@ import javafx.stage.Stage;
 import model.Cub;
 import model.Figure;
 
+
 public class Main extends Application {
     public static double size = 50;
-    private int rows = 8;
-    private int columns = 8;
+    private static int rows = 8;
+    private  static int columns = 8;
     public static Group root = new Group();
-    private Cub[][] board = new Cub[rows][columns];
+    public static Cub[][] board = new Cub[rows][columns];
 
     private void buildBoard() {
         for (int x = 0; x != rows; x++)
             for (int y = 0; y != columns; y++) {
                 board[x][y] = new Cub(x, y, (x + y) % 2 == 0);
+            }
+    }
+
+    private void buildFigures() {
+        for (int x = 0; x != rows; x++)
+            for (int y = 0; y != columns; y++) {
                 if (y <= 2 && (x + y) % 2 != 0) {
                     Figure black = new Figure(x, y, "black.png");
                     board[x][y].setFigure(black);
@@ -38,9 +46,11 @@ public class Main extends Application {
         theStage.setResizable(false);
 
         buildBoard();
+        buildFigures();
 
         theStage.show();
     }
+
 
     public static void main(String[] args) {
         launch(args);
