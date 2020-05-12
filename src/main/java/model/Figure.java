@@ -12,10 +12,12 @@ public class Figure extends Group {
     private double mouseX, mouseY;
     private int oldX, oldY;
     private int newX, newY;
+    private String image;
 
 
     public Figure(int x, int y, String image) {
         Circle cir = new Circle();
+        this.image = image;
         cir.setLayoutX(Main.size / 2 + x * Main.size);
         cir.setLayoutY(Main.size / 2 + y * Main.size);
         cir.setRadius(Main.size / 2);
@@ -75,6 +77,14 @@ public class Figure extends Group {
         return (int) ((cubCenter(mouseY) - Main.size / 2) / Main.size);
     }
 
+    private String getImage() {
+        return image;
+    }
+
+    private String getColor(int x, int y) {
+        return Main.board[x][y].getFigure().getImage();
+    }
+
     private int cubCenter(double cord) {
         int newKf = (int) (cord / Main.size);
         return (int) (newKf * Main.size + (Main.size / 2));
@@ -85,12 +95,16 @@ public class Figure extends Group {
             return new Controller(Step.None);
         oldX = getMouseX();
         oldY = getMouseY();
-        if (Math.abs(newX - oldX) == 1 && Math.abs(newY - oldY) == 1)
-            return new Controller(Step.Move);
+        if (Math.abs(newX - oldX) == 1) {
+            if (getColor(oldX, oldY).equals("white.png") && (newY - oldY) == -1)
+                return new Controller(Step.Move);
+            if (getColor(oldX, oldY).equals("black.png") && (newY - oldY) == 1)
+                return new Controller(Step.Move);
+        }
         if (Math.abs(newX - oldX) == 2 && Math.abs(newY - oldY) == 2) {
             int enemyX = oldX + (newX - oldX) / 2;
             int enemyY = oldY + (newY - oldY) / 2;
-            if (Main.board[enemyX][enemyY].hasFigure())
+            if (Main.board[enemyX][enemyY].hasFigure() && !getColor(oldX, oldY).equals(getColor(enemyX, enemyY)))
                 return new Controller(Main.board[enemyX][enemyY].getFigure(), Step.Kill);
         }
         return new Controller(Step.None);
