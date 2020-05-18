@@ -12,6 +12,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.Cub;
 import model.Figure;
+import model.King;
 
 
 public class Main extends Application {
@@ -34,10 +35,12 @@ public class Main extends Application {
             for (int y = 0; y != columns; y++) {
                 if (y <= 2 && (x + y) % 2 != 0) {
                     Figure black = new Figure(x, y, "black.png");
+                    black.moveFigure();
                     board[x][y].setFigure(black);
                 }
                 if (y >= 5 && (x + y) % 2 != 0) {
                     Figure white = new Figure(x, y, "white.png");
+                    white.moveFigure();
                     board[x][y].setFigure(white);
                 }
             }
