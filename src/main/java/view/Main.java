@@ -12,13 +12,16 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.Cub;
 import model.Figure;
-import model.King;
 
 
 public class Main extends Application {
-    public static double size = 50;
-    private static int rows = 8;
-    private static int columns = 8;
+    public final static double size = 50;
+    public final static int rows = 8;
+    public final static int columns = 8;
+    public final static char white = 'w';
+    public final static char black = 'b';
+    public static int contW = 12;
+    public static int contB = 12;
     private Stage stage;
     public static Group root = new Group();
     public static Cub[][] board = new Cub[rows][columns];
@@ -58,11 +61,43 @@ public class Main extends Application {
         buildBoard();
         buildFigures();
 
+        if (contB == 0 || contW == 0)
+            win();
+
         theStage.show();
         theStage.setOnCloseRequest(e -> {
             e.consume();
             closeWindow();
         });
+    }
+
+    private void win() {
+        Stage win = new Stage();
+        win.initModality(Modality.APPLICATION_MODAL);
+        AnchorPane wn = new AnchorPane();
+
+        Button newGame = new Button("Новая игра");
+        Button exit = new Button("Выход");
+        exit.setOnAction(e -> {
+            stage.close();
+            win.close();
+        });
+        newGame.setOnAction(e -> {
+            root.getChildren().removeAll();
+            buildBoard();
+            buildFigures();
+            win.close();
+        });
+        Label winLb = (contB == 0) ? new Label("Победили Белые!") : new Label("Победили Черные!");
+        AnchorPane.setTopAnchor(winLb, 20.0);
+        AnchorPane.setLeftAnchor(winLb, 30.0);
+        AnchorPane.setRightAnchor(winLb, 30.0);
+
+        wn.getChildren().add(newGame);
+        wn.getChildren().add(exit);
+        wn.getChildren().add(winLb);
+        win.setScene(new Scene(wn, 235, 80));
+        win.showAndWait();
     }
 
     private void closeWindow() {
@@ -94,7 +129,6 @@ public class Main extends Application {
         close.setScene(new Scene(closing, 235, 80));
         close.showAndWait();
     }
-
 
     public static void main(String[] args) {
         launch(args);

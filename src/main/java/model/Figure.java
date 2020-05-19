@@ -9,7 +9,7 @@ import javafx.scene.shape.Circle;
 import view.Main;
 
 public class Figure extends Group {
-    private double mouseX, mouseY;
+    private static double mouseX, mouseY;
     private int oldX, oldY;
     private int newX, newY;
     private int markX, markY;
@@ -18,8 +18,8 @@ public class Figure extends Group {
 
 
     public Figure(int x, int y, String image) {
-        cir = new Circle();
         this.image = image;
+        cir = new Circle();
         cir.setLayoutX(Main.size / 2 + x * Main.size);
         cir.setLayoutY(Main.size / 2 + y * Main.size);
         cir.setRadius(Main.size / 2);
@@ -28,17 +28,18 @@ public class Figure extends Group {
         getChildren().add(cir);
         Main.root.getChildren().add(this);
 
-        cir.setOnMousePressed(e -> {
+        setOnMousePressed(e -> {
             mouseX = e.getSceneX();
             mouseY = e.getSceneY();
 
         });
-        cir.setOnMouseDragged(e -> {
+        setOnMouseDragged(e -> {
             cir.setLayoutX(e.getSceneX());
             cir.setLayoutY(e.getSceneY());
         });
     }
 
+    //Ходы шашкой
     public void moveFigure() {
         cir.setOnMouseReleased(e -> {
             newX = (int) ((cubCenter(e.getSceneX()) - Main.size / 2) / Main.size);
@@ -54,28 +55,33 @@ public class Figure extends Group {
                 case Move:
                     cir.setLayoutX(cubCenter(e.getSceneX()));
                     cir.setLayoutY(cubCenter(e.getSceneY()));
-                    //hook(oldX,oldY);
-                    if (newY == 0 && (getColor(oldX, oldY) == 'w')) {
+                    if (newY == 0 && (getColor(oldX, oldY) == Main.white)) {
                         Main.root.getChildren().remove(this);
                         King whiteKing = new King(newX, newY, "whiteD.png");
                         Main.board[newX][newY].setFigure(whiteKing);
                     }
-                    if (newY == 7 && (getColor(oldX, oldY) == 'b')) {
+                    if (newY == 7 && (getColor(oldX, oldY) == Main.black)) {
                         Main.root.getChildren().remove(this);
                         King blackKing = new King(newX, newY, "blackD.png");
                         Main.board[newX][newY].setFigure(blackKing);
                     } else Main.board[newX][newY].setFigure(this);
-                    Main.board[oldX][oldY].setFigure(null);
+                    if (hook(oldX, oldY)) {
+                        char col = getColor(oldX, oldY);
+                        if (col == Main.white)
+                            Main.contW--;
+                        else Main.contB--;
+                        Main.board[newX][newY].setFigure(null);
+                    } else Main.board[oldX][oldY].setFigure(null);
                     break;
                 case Kill:
                     cir.setLayoutX(cubCenter(e.getSceneX()));
                     cir.setLayoutY(cubCenter(e.getSceneY()));
-                    if (newY == 0 && (getColor(oldX, oldY) == 'w')) {
+                    if (newY == 0 && (getColor(oldX, oldY) == Main.white)) {
                         Main.root.getChildren().remove(this);
                         King whiteKing = new King(newX, newY, "whiteD.png");
                         Main.board[newX][newY].setFigure(whiteKing);
                     }
-                    if (newY == 7 && (getColor(oldX, oldY) == 'b')) {
+                    if (newY == 7 && (getColor(oldX, oldY) == Main.black)) {
                         Main.root.getChildren().remove(this);
                         King blackKing = new King(newX, newY, "blackD.png");
                         Main.board[newX][newY].setFigure(blackKing);
@@ -85,6 +91,10 @@ public class Figure extends Group {
                     Figure otherFigure = result.getFigure();
                     int otherX = oldX - (oldX - newX) / 2;
                     int otherY = oldY - (oldY - newY) / 2;
+                    char otherColor = getColor(otherX, otherY);
+                    if (otherColor == Main.white)
+                        Main.contW--;
+                    else Main.contB--;
                     Main.board[otherX][otherY].setFigure(null);
                     Main.root.getChildren().remove(otherFigure);
                     break;
@@ -105,24 +115,27 @@ public class Figure extends Group {
         return image;
     }
 
+    //Цвет фигуры
     private char getColor(int x, int y) {
         return Main.board[x][y].getFigure().getImage().charAt(0);
     }
 
+    //Прилепить фигуру в центр клетки
     private int cubCenter(double cord) {
         int newKf = (int) (cord / Main.size);
         return (int) (newKf * Main.size + (Main.size / 2));
     }
 
+    //Логика шашки
     private Controller tryMove(int newX, int newY) {
         if (Main.board[newX][newY].hasFigure() || (newX + newY) % 2 == 0)
             return new Controller(Step.None);
         oldX = getMouseX();
         oldY = getMouseY();
         if (Math.abs(newX - oldX) == 1) {
-            if (getColor(oldX, oldY) == 'w' && (newY - oldY) == -1)
+            if (getColor(oldX, oldY) == Main.white && (newY - oldY) == -1)
                 return new Controller(Step.Move);
-            if (getColor(oldX, oldY) == 'b' && (newY - oldY) == 1)
+            if (getColor(oldX, oldY) == Main.black && (newY - oldY) == 1)
                 return new Controller(Step.Move);
         }
         if (Math.abs(newX - oldX) == 2 && Math.abs(newY - oldY) == 2) {
@@ -134,19 +147,40 @@ public class Figure extends Group {
         return new Controller(Step.None);
     }
 
-    private void hook(int oldX, int oldY) {
-        char oldC = getColor(oldX, oldY);
-        Figure oldFig = Main.board[oldX][oldY].getFigure();
-        if (Main.board[oldX + 1][oldY + 1].hasFigure() || Main.board[oldX - 1][oldY + 1].hasFigure() ||
-                Main.board[oldX + 1][oldY - 1].hasFigure() || Main.board[oldX - 1][oldY - 1].hasFigure())
-            if (getColor(oldX + 1, oldY + 1) != oldC || getColor(oldX - 1, oldY + 1) != oldC ||
-                    getColor(oldX + 1, oldY - 1) != oldC || getColor(oldX - 1, oldY - 1) != oldC) {
-                Main.board[oldX][oldY].setFigure(null);
-                Main.root.getChildren().remove(oldFig);
-            }
-
+    //Проверка на выход за границы массива
+    private boolean inside(int x, int y) {
+        return x < Main.columns && x >= 0 && y < Main.rows && y >= 0;
     }
 
+    //Взятие фигуры
+    private boolean hook(int oldX, int oldY) {
+        char oldC = getColor(oldX, oldY);
+        boolean hk = false;
+        Figure oldFig = Main.board[oldX][oldY].getFigure();
+        if (inside(oldX + 1, oldY + 1) &&
+                Main.board[oldX + 1][oldY + 1].hasFigure() && getColor(oldX + 1, oldY + 1) != oldC)
+            if (inside(oldX + 2, oldY + 2) && !Main.board[oldX + 2][oldY + 2].hasFigure())
+                hk = true;
+        if (inside(oldX - 1, oldY + 1) &&
+                Main.board[oldX - 1][oldY + 1].hasFigure() && getColor(oldX - 1, oldY + 1) != oldC)
+            if (inside(oldX - 2, oldY + 2) && !Main.board[oldX - 2][oldY + 2].hasFigure())
+                hk = true;
+        if (inside(oldX + 1, oldY - 1) &&
+                Main.board[oldX + 1][oldY - 1].hasFigure() && getColor(oldX + 1, oldY - 1) != oldC)
+            if (inside(oldX + 2, oldY - 2) && !Main.board[oldX + 2][oldY - 2].hasFigure())
+                hk = true;
+        if (inside(oldX - 1, oldY - 1) &&
+                Main.board[oldX - 1][oldY - 1].hasFigure() && getColor(oldX - 1, oldY - 1) != oldC)
+            if (inside(oldX - 2, oldY - 2) && !Main.board[oldX - 2][oldY - 2].hasFigure())
+                hk = true;
+        if (hk) {
+            Main.board[oldX][oldY].setFigure(null);
+            Main.root.getChildren().remove(oldFig);
+        }
+        return hk;
+    }
+
+    //Ходы дамкой
     void moveKing() {
         cir.setOnMouseReleased(e -> {
             newX = (int) ((cubCenter(e.getSceneX()) - Main.size / 2) / Main.size);
@@ -172,6 +206,10 @@ public class Figure extends Group {
                     Main.board[newX][newY].setFigure(this);
 
                     Figure otherFigure = result.getFigure();
+                    char otherColor = getColor(markX, markY);
+                    if (otherColor == Main.white)
+                        Main.contW--;
+                    else Main.contB--;
                     Main.board[markX][markY].setFigure(null);
                     Main.root.getChildren().remove(otherFigure);
                     break;
@@ -179,6 +217,7 @@ public class Figure extends Group {
         });
     }
 
+    //Логика дамки
     private Controller tryMoveKing(int newX, int newY) {
         if (Main.board[newX][newY].hasFigure() || (newX + newY) % 2 == 0)
             return new Controller(Step.None);
