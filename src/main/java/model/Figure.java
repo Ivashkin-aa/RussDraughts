@@ -66,10 +66,8 @@ public class Figure extends Group {
                         Main.board[newX][newY].setFigure(blackKing);
                     } else Main.board[newX][newY].setFigure(this);
                     if (hook(oldX, oldY)) {
-                        char col = getColor(oldX, oldY);
-                        if (col == Main.white)
-                            Main.contW--;
-                        else Main.contB--;
+                        System.out.println(oldX);
+                        System.out.println(oldY);
                         Main.board[newX][newY].setFigure(null);
                     } else Main.board[oldX][oldY].setFigure(null);
                     break;
@@ -92,9 +90,6 @@ public class Figure extends Group {
                     int otherX = oldX - (oldX - newX) / 2;
                     int otherY = oldY - (oldY - newY) / 2;
                     char otherColor = getColor(otherX, otherY);
-                    if (otherColor == Main.white)
-                        Main.contW--;
-                    else Main.contB--;
                     Main.board[otherX][otherY].setFigure(null);
                     Main.root.getChildren().remove(otherFigure);
                     break;
@@ -127,7 +122,7 @@ public class Figure extends Group {
     }
 
     //Логика шашки
-    private Controller tryMove(int newX, int newY) {
+    public Controller tryMove(int newX, int newY) {
         if (Main.board[newX][newY].hasFigure() || (newX + newY) % 2 == 0)
             return new Controller(Step.None);
         oldX = getMouseX();
@@ -153,7 +148,7 @@ public class Figure extends Group {
     }
 
     //Взятие фигуры
-    private boolean hook(int oldX, int oldY) {
+    public boolean hook(int oldX, int oldY) {
         char oldC = getColor(oldX, oldY);
         boolean hk = false;
         Figure oldFig = Main.board[oldX][oldY].getFigure();
@@ -207,9 +202,7 @@ public class Figure extends Group {
 
                     Figure otherFigure = result.getFigure();
                     char otherColor = getColor(markX, markY);
-                    if (otherColor == Main.white)
-                        Main.contW--;
-                    else Main.contB--;
+
                     Main.board[markX][markY].setFigure(null);
                     Main.root.getChildren().remove(otherFigure);
                     break;
@@ -218,13 +211,107 @@ public class Figure extends Group {
     }
 
     //Логика дамки
-    private Controller tryMoveKing(int newX, int newY) {
+    public Controller tryMoveKing(int newX, int newY) {
         if (Main.board[newX][newY].hasFigure() || (newX + newY) % 2 == 0)
             return new Controller(Step.None);
         if (Math.abs(newX - oldX) == Math.abs(newY - oldY)) {
+            /*int nowX = 0, nowY = 0;
+            if (oldX > newX && oldY > newY) {
+                while (!Main.board[nowX][nowY].hasFigure() || nowX < newX || nowY < newY) {
+                    nowX = oldX - 1;
+                    nowY = oldY - 1;
+                }
+                if (Main.board[nowX][nowY].hasFigure()) {
+                    if (getColor(nowX, nowY) == getColor(oldX, oldY))
+                        return new Controller(Step.None);
+                    else {
+                        int markX = nowX;
+                        int markY = nowY;
+                        nowX--;
+                        nowY--;
+                        while (!Main.board[nowX][nowY].hasFigure() || nowX < newX || nowY < newY) {
+                            nowX--;
+                            nowY--;
+                        }
+                        if (Main.board[nowX][nowY].hasFigure())
+                            return new Controller(Step.None);
+                        else return new Controller(Main.board[markX][markY].getFigure(), Step.Kill);
+                    }
+                } else return new Controller(Step.Move);
+            }
+            if (oldX > newX && oldY < newY) {
+                while (!Main.board[nowX][nowY].hasFigure() || nowX < newX || nowY < newY) {
+                    nowX = oldX - 1;
+                    nowY = oldY + 1;
+                }
+                if (Main.board[nowX][nowY].hasFigure()) {
+                    if (getColor(nowX, nowY) == getColor(oldX, oldY))
+                        return new Controller(Step.None);
+                    else {
+                        int markX = nowX;
+                        int markY = nowY;
+                        nowX--;
+                        nowY++;
+                        while (!Main.board[nowX][nowY].hasFigure() || nowX < newX || nowY < newY) {
+                            nowX--;
+                            nowY++;
+                        }
+                        if (Main.board[nowX][nowY].hasFigure())
+                            return new Controller(Step.None);
+                        else return new Controller(Main.board[markX][markY].getFigure(), Step.Kill);
+                    }
+                } else return new Controller(Step.Move);
+            }
+            if (oldX < newX && oldY > newY) {
+                while (!Main.board[nowX][nowY].hasFigure() || nowX < newX || nowY < newY) {
+                    nowX = oldX + 1;
+                    nowY = oldY - 1;
+                }
+                if (Main.board[nowX][nowY].hasFigure()) {
+                    if (getColor(nowX, nowY) == getColor(oldX, oldY))
+                        return new Controller(Step.None);
+                    else {
+                        int markX = nowX;
+                        int markY = nowY;
+                        nowX++;
+                        nowY--;
+                        while (!Main.board[nowX][nowY].hasFigure() || nowX < newX || nowY < newY) {
+                            nowX++;
+                            nowY--;
+                        }
+                        if (Main.board[nowX][nowY].hasFigure())
+                            return new Controller(Step.None);
+                        else return new Controller(Main.board[markX][markY].getFigure(), Step.Kill);
+                    }
+                } else return new Controller(Step.Move);
+            }
+            if (oldX < newX && oldY < newY) {
+                while (!Main.board[nowX][nowY].hasFigure() || nowX < newX || nowY < newY) {
+                    nowX = oldX + 1;
+                    nowY = oldY + 1;
+                }
+                if (Main.board[nowX][nowY].hasFigure()) {
+                    if (getColor(nowX, nowY) == getColor(oldX, oldY))
+                        return new Controller(Step.None);
+                    else {
+                        int markX = nowX;
+                        int markY = nowY;
+                        nowX++;
+                        nowY++;
+                        while (!Main.board[nowX][nowY].hasFigure() || nowX < newX || nowY < newY) {
+                            nowX++;
+                            nowY++;
+                        }
+                        if (Main.board[nowX][nowY].hasFigure())
+                            return new Controller(Step.None);
+                        else return new Controller(Main.board[markX][markY].getFigure(), Step.Kill);
+                    }
+                } else return new Controller(Step.Move);
+            }*/
             if (newX > oldX)
                 markX = newX - 1;
-            else markX = newX + 1;
+            else
+                markX = newX + 1;
             if (newY > oldY)
                 markY = newY - 1;
             else markY = newY + 1;

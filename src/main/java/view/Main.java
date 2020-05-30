@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -20,8 +21,6 @@ public class Main extends Application {
     public final static int columns = 8;
     public final static char white = 'w';
     public final static char black = 'b';
-    public static int contW = 12;
-    public static int contB = 12;
     private Stage stage;
     public static Group root = new Group();
     public static Cub[][] board = new Cub[rows][columns];
@@ -55,49 +54,26 @@ public class Main extends Application {
         theStage.setTitle("Русские шашки");
         theStage.getIcons().add(new Image("icon.png"));
         Scene theScene = new Scene(root, rows * size, columns * size);
+        Image upIcon = new Image("up.png");
+        Button up = new Button("",new ImageView(upIcon));
         theStage.setScene(theScene);
         theStage.setResizable(false);
 
         buildBoard();
         buildFigures();
-
-        if (contB == 0 || contW == 0)
-            win();
+        root.getChildren().add(up);
 
         theStage.show();
+        up.setOnAction(e-> {
+            root.getChildren().clear();
+            buildBoard();
+            buildFigures();
+            root.getChildren().add(up);
+        });
         theStage.setOnCloseRequest(e -> {
             e.consume();
             closeWindow();
         });
-    }
-
-    private void win() {
-        Stage win = new Stage();
-        win.initModality(Modality.APPLICATION_MODAL);
-        AnchorPane wn = new AnchorPane();
-
-        Button newGame = new Button("Новая игра");
-        Button exit = new Button("Выход");
-        exit.setOnAction(e -> {
-            stage.close();
-            win.close();
-        });
-        newGame.setOnAction(e -> {
-            root.getChildren().removeAll();
-            buildBoard();
-            buildFigures();
-            win.close();
-        });
-        Label winLb = (contB == 0) ? new Label("Победили Белые!") : new Label("Победили Черные!");
-        AnchorPane.setTopAnchor(winLb, 20.0);
-        AnchorPane.setLeftAnchor(winLb, 30.0);
-        AnchorPane.setRightAnchor(winLb, 30.0);
-
-        wn.getChildren().add(newGame);
-        wn.getChildren().add(exit);
-        wn.getChildren().add(winLb);
-        win.setScene(new Scene(wn, 235, 80));
-        win.showAndWait();
     }
 
     private void closeWindow() {
