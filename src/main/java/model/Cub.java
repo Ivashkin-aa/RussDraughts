@@ -4,28 +4,26 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import view.Main;
 
-public class Cub {
+public class Cub extends Rectangle {
     private Figure figure;
 
     public Cub(int x, int y, boolean white) {
-        Rectangle rec = new Rectangle();
-        rec.setX(x * Main.size);
-        rec.setY(y * Main.size);
-        rec.setWidth(Main.size);
-        rec.setHeight(Main.size);
-        rec.setFill(white ? Color.valueOf("#c8c8c8") : Color.valueOf("#646464"));
-        Main.root.getChildren().add(rec);
+        setX(x * Main.size);
+        setY(y * Main.size);
+        setWidth(Main.size);
+        setHeight(Main.size);
+        setFill(white ? Color.valueOf("#ffcf9f") : Color.valueOf("#d28c45"));
     }
 
     public void setFigure(Figure figure) {
         this.figure = figure;
     }
 
-    Figure getFigure() {
+    public Figure getFigure() {
         return figure;
     }
 
-    boolean hasFigure() {
+    public boolean hasFigure() {
         return figure != null;
     }
 

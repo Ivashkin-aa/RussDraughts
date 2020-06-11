@@ -1,43 +1,40 @@
 package model;
 
-import controller.Controller;
-import controller.Step;
 import javafx.scene.Group;
-import javafx.scene.image.Image;
-import javafx.scene.paint.ImagePattern;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import view.Main;
 
 public class Figure extends Group {
-    private static double mouseX, mouseY;
-    private int oldX, oldY;
-    private int newX, newY;
-    private int markX, markY;
-    private String image;
-    private Circle cir;
+    public static double mouseX, mouseY;
+    private boolean color;
+    Circle cir;
 
+    public boolean getColor() {
+        return color;
+    }
 
-    public Figure(int x, int y, String image) {
-        this.image = image;
+    public Figure(int x, int y, boolean color) {
+        this.color = color;
         cir = new Circle();
         cir.setLayoutX(Main.size / 2 + x * Main.size);
         cir.setLayoutY(Main.size / 2 + y * Main.size);
-        cir.setRadius(Main.size / 2);
-        Image figure = new Image(String.valueOf(image));
-        cir.setFill(new ImagePattern(figure));
+        cir.setRadius(Main.size / 3);
+        cir.setFill(color ? Color.WHITE : Color.BLACK);
+        cir.setStroke(color ? Color.BLACK : Color.WHITE);
         getChildren().add(cir);
-        Main.root.getChildren().add(this);
 
         setOnMousePressed(e -> {
             mouseX = e.getSceneX();
             mouseY = e.getSceneY();
-
         });
         setOnMouseDragged(e -> {
             cir.setLayoutX(e.getSceneX());
             cir.setLayoutY(e.getSceneY());
         });
     }
+
+        /*
 
     //Ходы шашкой
     public void moveFigure() {
@@ -95,30 +92,6 @@ public class Figure extends Group {
                     break;
             }
         });
-    }
-
-
-    private int getMouseX() {
-        return (int) ((cubCenter(mouseX) - Main.size / 2) / Main.size);
-    }
-
-    private int getMouseY() {
-        return (int) ((cubCenter(mouseY) - Main.size / 2) / Main.size);
-    }
-
-    private String getImage() {
-        return image;
-    }
-
-    //Цвет фигуры
-    private char getColor(int x, int y) {
-        return Main.board[x][y].getFigure().getImage().charAt(0);
-    }
-
-    //Прилепить фигуру в центр клетки
-    private int cubCenter(double cord) {
-        int newKf = (int) (cord / Main.size);
-        return (int) (newKf * Main.size + (Main.size / 2));
     }
 
     //Логика шашки
@@ -215,7 +188,7 @@ public class Figure extends Group {
         if (Main.board[newX][newY].hasFigure() || (newX + newY) % 2 == 0)
             return new Controller(Step.None);
         if (Math.abs(newX - oldX) == Math.abs(newY - oldY)) {
-            /*int nowX = 0, nowY = 0;
+            *//*int nowX = 0, nowY = 0;
             if (oldX > newX && oldY > newY) {
                 while (!Main.board[nowX][nowY].hasFigure() || nowX < newX || nowY < newY) {
                     nowX = oldX - 1;
@@ -307,7 +280,7 @@ public class Figure extends Group {
                         else return new Controller(Main.board[markX][markY].getFigure(), Step.Kill);
                     }
                 } else return new Controller(Step.Move);
-            }*/
+            }*//*
             if (newX > oldX)
                 markX = newX - 1;
             else
@@ -320,6 +293,6 @@ public class Figure extends Group {
             else return new Controller(Step.Move);
         }
         return new Controller(Step.None);
-    }
+    }*/
 }
 
