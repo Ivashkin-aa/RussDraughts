@@ -1,25 +1,11 @@
 package model;
 
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import view.Main;
+import view.FigureView;
 
-public class Cub extends Rectangle {
-    private Figure figure;
+public class Cub {
+    public FigureView figure;
 
-    public Cub(int x, int y, boolean white) {
-        setX(x * Main.size);
-        setY(y * Main.size);
-        setWidth(Main.size);
-        setHeight(Main.size);
-        setFill(white ? Color.valueOf("#ffcf9f") : Color.valueOf("#d28c45"));
-    }
-
-    public void setFigure(Figure figure) {
-        this.figure = figure;
-    }
-
-    public Figure getFigure() {
+    public FigureView getFigure() {
         return figure;
     }
 
@@ -27,4 +13,7 @@ public class Cub extends Rectangle {
         return figure != null;
     }
 
+    public void setFigure(FigureView figure) {
+        this.figure = figure;
+    }
 }
